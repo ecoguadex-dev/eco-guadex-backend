@@ -3,10 +3,12 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
+// Root test route
 app.get("/", (req, res) => {
-    res.send("EcoGuadex API is running");
+    res.send("EcoGuadex API is LIVE");
 });
 
+// Stable metrics endpoint (NO MongoDB)
 app.get("/metrics", (req, res) => {
     res.json({
         health: 95,
@@ -15,6 +17,11 @@ app.get("/metrics", (req, res) => {
         network: 120,
         demand: 70
     });
+});
+
+// Health check
+app.get("/health", (req, res) => {
+    res.json({ status: "ok" });
 });
 
 app.listen(PORT, () => {
