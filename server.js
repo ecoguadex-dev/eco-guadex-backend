@@ -30,6 +30,7 @@ if (process.env.MONGO_URI) {
 
 const Metrics = mongoose.model("Metrics", MetricsSchema);
 }
+
 // ===== SCHEMA =====
 const MetricsSchema = new mongoose.Schema({
     health: Number,
@@ -87,7 +88,30 @@ app.get("/metrics", async (req, res) => {
         });
     }
 });
-     
+
+app.post("/metrics", express.json(), async (req, res) => {
+    try {
+        if (mongoose.connection.readyState !== 1) {
+            return res.status(503).json({
+                error: "Database not connected"
+            });
+        }
+
+        const newMetrics = new Metrics(req.body);
+        await newMetrics.save();
+
+        return res.json({
+            message: "Metrics saved successfully",
+            data: newMetrics
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            error: error.message
+        });
+    }
+});
+
 // fallback (ALWAYS SAFE)
         return res.json({
             source: "fallback",
