@@ -30,7 +30,7 @@ const MetricsSchema = new mongoose.Schema({
     }
 });
 
-const Metrics = mongoose.models.Metrics || mongoose.model("Metrics", MetricsSchema);
+const Metrics = mongoose.model("Metrics");
 
 app.get("/", (req, res) => {
     res.send("EcoGuadex API is LIVE");
