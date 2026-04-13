@@ -28,11 +28,11 @@ if (process.env.MONGO_URI) {
     }
 });
 
-const Metrics = mongoose.model("Metrics", MetricsSchema);
+const Metrics = mongoose.model("Metrics");
 }
 
 // ===== SCHEMA =====
-const MetricsSchema = new mongoose.Schema({
+const Metrics = new mongoose.Schema({
     health: Number,
     flow: Number,
     load: Number,
@@ -40,7 +40,7 @@ const MetricsSchema = new mongoose.Schema({
     demand: Number
 }, { timestamps: true });
 
-const Metrics = mongoose.models.Metrics || mongoose.model("Metrics", MetricsSchema);
+const Metrics = mongoose.models.Metrics || mongoose.model("Metrics");
 
 // ===== ROUTES =====
 
