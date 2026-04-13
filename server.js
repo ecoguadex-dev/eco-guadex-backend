@@ -7,72 +7,46 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // =====================
-// SAFE MONGODB CONNECT
+// CONNECT TO MONGODB
 // =====================
-async function connectDB() {
-    try {
-        if (!process.env.MONGO_URI) {
-            console.log("No MONGO_URI provided");
-            return;
-        }
+mongoose.connect(process.env.MONGO_URI)
+.then(() => {
+    console.log("MongoDB Connected");
+})
+.catch((err) => {
+    console.log("MongoDB Error:", err.message);
+});
 
-        await mongoose.connect(process.env.MONGO_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
-
-        console.log("MongoDB Connected");
-
-    } catch (err) {
-        console.log("MongoDB Error:", err.message);
+// =====================
+// SCHEMA (DEFINE FIRST)
+// =====================
+const MetricsSchema = new mongoose.Schema({
+    health: Number,
+    flow: Number,
+    load: Number,
+    network: Number,
+    demand: Number,
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
-}
-
-connectDB();
+});
 
 // =====================
-// SAFE MODEL INIT
+// MODEL (DEFINE AFTER SCHEMA)
 // =====================
-let Metrics;
-
-try {
-    const MetricsSchema = new mongoose.Schema({
-        health: Number,
-        flow: Number,
-        load: Number,
-        network: Number,
-        demand: Number,
-        createdAt: {
-            type: Date,
-            default: Date.now
-        }
-    });
-
-    Metrics = mongoose.model("Metrics");
-} catch (e) {
-    const MetricsSchema = new mongoose.Schema({
-        health: Number,
-        flow: Number,
-        load: Number,
-        network: Number,
-        demand: Number,
-        createdAt: {
-            type: Date,
-            default: Date.now
-        }
-    });
-
-    Metrics = mongoose.model("Metrics", MetricsSchema);
-}
+const Metrics = mongoose.model("Metrics", MetricsSchema);
 
 // =====================
 // ROUTES
 // =====================
 
+// Root route
 app.get("/", function (req, res) {
     res.send("EcoGuadex API is LIVE");
 });
 
+// GET metrics
 app.get("/metrics", async function (req, res) {
     try {
         if (mongoose.connection.readyState === 1) {
@@ -99,12 +73,13 @@ app.get("/metrics", async function (req, res) {
 
     } catch (error) {
         return res.json({
-            source: "error-fallback",
-            error: error.message
+            source: "error",
+            message: error.message
         });
     }
 });
 
+// POST metrics
 app.post("/metrics", async function (req, res) {
     try {
         if (mongoose.connection.readyState !== 1) {
@@ -117,7 +92,7 @@ app.post("/metrics", async function (req, res) {
         await newMetrics.save();
 
         return res.json({
-            message: "Metrics saved successfully",
+            message: "Metrics saved",
             data: newMetrics
         });
 
