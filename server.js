@@ -4,10 +4,11 @@ const mongoose = require("mongoose");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Middleware
 app.use(express.json());
 
 // =====================
-// MongoDB CONNECTION
+// DATABASE CONNECTION
 // =====================
 let dbConnected = false;
 
@@ -16,13 +17,13 @@ mongoose.connect(process.env.MONGO_URI)
     dbConnected = true;
     console.log("MongoDB Connected");
 })
-.catch(err => {
+.catch((err) => {
     dbConnected = false;
     console.log("MongoDB Error:", err.message);
 });
 
 // =====================
-// SCHEMA + MODEL
+// SCHEMA & MODEL
 // =====================
 const MetricsSchema = new mongoose.Schema({
     health: Number,
@@ -36,19 +37,21 @@ const MetricsSchema = new mongoose.Schema({
     }
 });
 
-// IMPORTANT FIX (prevents OverwriteModelError)
+// SAFE MODEL (prevents OverwriteModelError)
 const Metrics = mongoose.models.Metrics || mongoose.model("Metrics", MetricsSchema);
 
 // =====================
 // ROUTES
 // =====================
 
-// Health check
+// Root check
 app.get("/", (req, res) => {
     res.send("EcoGuadex API is LIVE");
 });
 
-// GET metrics
+// =====================
+// GET METRICS
+// =====================
 app.get("/metrics", async (req, res) => {
     try {
         if (mongoose.connection.readyState === 1) {
@@ -88,7 +91,9 @@ app.get("/metrics", async (req, res) => {
     }
 });
 
-// POST metrics (save data)
+// =====================
+// POST METRICS
+// =====================
 app.post("/metrics", async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
@@ -116,5 +121,5 @@ app.post("/metrics", async (req, res) => {
 // START SERVER
 // =====================
 app.listen(PORT, () => {
-    console.log("EcoGuadex API running on port", PORT);
+    console.log(`EcoGuadex API running on port ${PORT}`);
 });
