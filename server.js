@@ -16,9 +16,20 @@ if (process.env.MONGO_URI) {
         .catch(err => {
             dbConnected = false;
             console.log("MongoDB Connection Error:", err.message);
-        });
-}
+        }); const MetricsSchema = new mongoose.Schema({
+    health: Number,
+    flow: Number,
+    load: Number,
+    network: Number,
+    demand: Number,
+    createdAt: {
+        type: Date,
+        default: Date.now
+    }
+});
 
+const Metrics = mongoose.model("Metrics", MetricsSchema);
+}
 // ===== SCHEMA =====
 const MetricsSchema = new mongoose.Schema({
     health: Number,
