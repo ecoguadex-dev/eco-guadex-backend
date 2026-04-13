@@ -4,19 +4,27 @@ const mongoose = require("mongoose");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ===== SAFE DATABASE CONNECTION =====
+app.use(express.json());
+
+// =====================
+// MongoDB CONNECTION
+// =====================
 let dbConnected = false;
 
-if (process.env.MONGO_URI) {
-    mongoose.connect(process.env.MONGO_URI)
-        .then(() => {
-            dbConnected = true;
-            console.log("MongoDB Connected");
-        })
-        .catch(err => {
-            dbConnected = false;
-            console.log("MongoDB Connection Error:", err.message);
-        }); const MetricsSchema = new mongoose.Schema({
+mongoose.connect(process.env.MONGO_URI)
+.then(() => {
+    dbConnected = true;
+    console.log("MongoDB Connected");
+})
+.catch(err => {
+    dbConnected = false;
+    console.log("MongoDB Error:", err.message);
+});
+
+// =====================
+// SCHEMA + MODEL
+// =====================
+const MetricsSchema = new mongoose.Schema({
     health: Number,
     flow: Number,
     load: Number,
@@ -28,28 +36,19 @@ if (process.env.MONGO_URI) {
     }
 });
 
-const Metrics = mongoose.model("Metrics");
-}
+// IMPORTANT FIX (prevents OverwriteModelError)
+const Metrics = mongoose.models.Metrics || mongoose.model("Metrics", MetricsSchema);
 
-// ===== SCHEMA =====
-const Metrics = new mongoose.Schema({
-    health: Number,
-    flow: Number,
-    load: Number,
-    network: Number,
-    demand: Number
-}, { timestamps: true });
-
-const Metrics = mongoose.models.Metrics || mongoose.model("Metrics");
-
-// ===== ROUTES =====
+// =====================
+// ROUTES
+// =====================
 
 // Health check
 app.get("/", (req, res) => {
     res.send("EcoGuadex API is LIVE");
 });
 
-// Metrics route (SAFE + fallback)
+// GET metrics
 app.get("/metrics", async (req, res) => {
     try {
         if (mongoose.connection.readyState === 1) {
@@ -89,7 +88,8 @@ app.get("/metrics", async (req, res) => {
     }
 });
 
-app.post("/metrics", express.json(), async (req, res) => {
+// POST metrics (save data)
+app.post("/metrics", async (req, res) => {
     try {
         if (mongoose.connection.readyState !== 1) {
             return res.status(503).json({
@@ -112,31 +112,9 @@ app.post("/metrics", express.json(), async (req, res) => {
     }
 });
 
-// fallback (ALWAYS SAFE)
-        return res.json({
-            source: "fallback",
-            health: 95,
-            flow: 100,
-            load: 40,
-            network: 120,
-            demand: 70
-        });
-
-    } catch (error) {
-        console.log("Metrics Error:", error.message);
-
-        return res.json({
-            source: "fallback-error",
-            health: 95,
-            flow: 100,
-            load: 40,
-            network: 120,
-            demand: 70
-        });
-    }
-});
-
-// ===== START SERVER =====
+// =====================
+// START SERVER
+// =====================
 app.listen(PORT, () => {
     console.log("EcoGuadex API running on port", PORT);
 });
