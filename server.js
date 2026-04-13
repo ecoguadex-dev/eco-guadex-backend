@@ -40,7 +40,7 @@ const MetricsSchema = new mongoose.Schema({
     demand: Number
 }, { timestamps: true });
 
-const Metrics = mongoose.model("Metrics", MetricsSchema);
+const Metrics = mongoose.models.Metrics || mongoose.model("Metrics", MetricsSchema);
 
 // ===== ROUTES =====
 
