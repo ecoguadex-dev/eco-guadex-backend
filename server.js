@@ -51,18 +51,44 @@ app.get("/", (req, res) => {
 // Metrics route (SAFE + fallback)
 app.get("/metrics", async (req, res) => {
     try {
-        if (dbConnected) {
-            const data = await Metrics.findOne().sort({ createdAt: -1 });
+        if (mongoose.connection.readyState === 1) {
+            const latest = await Metrics.findOne().sort({ createdAt: -1 });
 
-            if (data) {
+            if (latest) {
                 return res.json({
                     source: "database",
-                    data
+                    latest
                 });
             }
         }
 
-        // fallback (ALWAYS SAFE)
+        return res.json({
+            source: "fallback",
+            latest: {
+                health: 95,
+                flow: 100,
+                load: 40,
+                network: 120,
+                demand: 70
+            }
+        });
+
+    } catch (error) {
+        return res.json({
+            source: "error-fallback",
+            error: error.message,
+            latest: {
+                health: 95,
+                flow: 100,
+                load: 40,
+                network: 120,
+                demand: 70
+            }
+        });
+    }
+});
+     
+// fallback (ALWAYS SAFE)
         return res.json({
             source: "fallback",
             health: 95,
