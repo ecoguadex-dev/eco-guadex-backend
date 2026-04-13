@@ -6,37 +6,74 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 
-let dbConnected = false;
+// =====================
+// SAFE MONGODB CONNECT
+// =====================
+async function connectDB() {
+    try {
+        if (!process.env.MONGO_URI) {
+            console.log("No MONGO_URI provided");
+            return;
+        }
 
-mongoose.connect(process.env.MONGO_URI)
-.then(() => {
-    dbConnected = true;
-    console.log("MongoDB Connected");
-})
-.catch(err => {
-    dbConnected = false;
-    console.log("MongoDB Error:", err.message);
-});
+        await mongoose.connect(process.env.MONGO_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true
+        });
 
-const MetricsSchema = new mongoose.Schema({
-    health: Number,
-    flow: Number,
-    load: Number,
-    network: Number,
-    demand: Number,
-    createdAt: {
-        type: Date,
-        default: Date.now
+        console.log("MongoDB Connected");
+
+    } catch (err) {
+        console.log("MongoDB Error:", err.message);
     }
-});
+}
 
-const Metrics = mongoose.model("Metrics");
+connectDB();
 
-app.get("/", (req, res) => {
+// =====================
+// SAFE MODEL INIT
+// =====================
+let Metrics;
+
+try {
+    const MetricsSchema = new mongoose.Schema({
+        health: Number,
+        flow: Number,
+        load: Number,
+        network: Number,
+        demand: Number,
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
+    });
+
+    Metrics = mongoose.model("Metrics");
+} catch (e) {
+    const MetricsSchema = new mongoose.Schema({
+        health: Number,
+        flow: Number,
+        load: Number,
+        network: Number,
+        demand: Number,
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
+    });
+
+    Metrics = mongoose.model("Metrics", MetricsSchema);
+}
+
+// =====================
+// ROUTES
+// =====================
+
+app.get("/", function (req, res) {
     res.send("EcoGuadex API is LIVE");
 });
 
-app.get("/metrics", async (req, res) => {
+app.get("/metrics", async function (req, res) {
     try {
         if (mongoose.connection.readyState === 1) {
             const latest = await Metrics.findOne().sort({ createdAt: -1 });
@@ -44,7 +81,7 @@ app.get("/metrics", async (req, res) => {
             if (latest) {
                 return res.json({
                     source: "database",
-                    latest
+                    latest: latest
                 });
             }
         }
@@ -63,19 +100,12 @@ app.get("/metrics", async (req, res) => {
     } catch (error) {
         return res.json({
             source: "error-fallback",
-            error: error.message,
-            latest: {
-                health: 95,
-                flow: 100,
-                load: 40,
-                network: 120,
-                demand: 70
-            }
+            error: error.message
         });
     }
 });
 
-app.post("/metrics", async (req, res) => {
+app.post("/metrics", async function (req, res) {
     try {
         if (mongoose.connection.readyState !== 1) {
             return res.status(503).json({
@@ -98,6 +128,9 @@ app.post("/metrics", async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log("EcoGuadex API running on port", PORT);
+// =====================
+// START SERVER
+// =====================
+app.listen(PORT, function () {
+    console.log("EcoGuadex API running on port " + PORT);
 });
