@@ -7,18 +7,18 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // =====================
-// CONNECT TO MONGODB
+// DATABASE CONNECTION
 // =====================
 mongoose.connect(process.env.MONGO_URI)
-.then(function () {
+.then(() => {
     console.log("MongoDB Connected");
 })
-.catch(function (err) {
+.catch((err) => {
     console.log("MongoDB Error:", err.message);
 });
 
 // =====================
-// SCHEMA
+// SCHEMA (CORRECT)
 // =====================
 const MetricsSchema = new mongoose.Schema({
     health: Number,
@@ -33,21 +33,18 @@ const MetricsSchema = new mongoose.Schema({
 });
 
 // =====================
-// MODEL
+// MODEL (CORRECT)
 // =====================
 const Metrics = mongoose.model("Metrics", MetricsSchema);
 
 // =====================
 // ROUTES
 // =====================
-
-// Root
-app.get("/", function (req, res) {
+app.get("/", (req, res) => {
     res.send("EcoGuadex API is LIVE");
 });
 
-// GET metrics
-app.get("/metrics", async function (req, res) {
+app.get("/metrics", async (req, res) => {
     try {
         const latest = await Metrics.findOne().sort({ createdAt: -1 });
 
@@ -62,8 +59,7 @@ app.get("/metrics", async function (req, res) {
     }
 });
 
-// POST metrics
-app.post("/metrics", async function (req, res) {
+app.post("/metrics", async (req, res) => {
     try {
         const newMetrics = new Metrics(req.body);
         await newMetrics.save();
@@ -81,6 +77,6 @@ app.post("/metrics", async function (req, res) {
 // =====================
 // START SERVER
 // =====================
-app.listen(PORT, function () {
+app.listen(PORT, () => {
     console.log("Server running on port " + PORT);
 });
