@@ -40,10 +40,13 @@ const Metrics = mongoose.model("Metrics", MetricsSchema);
 // =====================
 // ROUTES
 // =====================
+
+// Root
 app.get("/", function (req, res) {
     res.send("EcoGuadex API is LIVE");
 });
 
+// GET metrics
 app.get("/metrics", async function (req, res) {
     try {
         const latest = await Metrics.findOne().sort({ createdAt: -1 });
@@ -59,6 +62,25 @@ app.get("/metrics", async function (req, res) {
     }
 });
 
+// POST metrics
+app.post("/metrics", async function (req, res) {
+    try {
+        const newMetrics = new Metrics(req.body);
+        await newMetrics.save();
+
+        return res.json({
+            message: "Saved successfully",
+            data: newMetrics
+        });
+
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+});
+
+// =====================
+// START SERVER
+// =====================
 app.listen(PORT, function () {
     console.log("Server running on port " + PORT);
 });
