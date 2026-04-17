@@ -1,12 +1,14 @@
 {
-  "name": "eco-guadex-backend",
+  "name": "ecoguadex-api",
   "version": "1.0.0",
+  "description": "EcoGuadex Backend API",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "express": "^4.18.2",
-    "mongoose": "^7.6.0"
+    "mongoose": "^8.3.0"
   }
 }
