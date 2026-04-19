@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: "./.env" });
 
 const express = require("express");
 const mongoose = require("mongoose");
@@ -9,26 +9,34 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 // =====================
-// DEBUG CHECK (remove later)
+// DEBUG CHECK
 // =====================
 console.log("MONGO_URI:", process.env.MONGO_URI ? "Loaded" : "Missing");
 
 // =====================
 // DATABASE CONNECTION
 // =====================
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
+async function startServer() {
+  try {
+    if (!process.env.MONGO_URI) {
+      throw new Error("MONGO_URI is not defined in .env");
+    }
+
+    await mongoose.connect(process.env.MONGO_URI);
+
     console.log("MongoDB Connected");
 
-    // Start server ONLY after DB connects
     app.listen(PORT, () => {
       console.log("Server running on port " + PORT);
     });
-  })
-  .catch((err) => {
-    console.error("MongoDB Connection Error:", err);
-    process.exit(1); // Force crash so Render shows real error
-  });
+
+  } catch (error) {
+    console.error("Startup Error:", error.message);
+    process.exit(1);
+  }
+}
+
+startServer();
 
 // =====================
 // SCHEMA
