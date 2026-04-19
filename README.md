@@ -35,7 +35,7 @@ This is the backend server for the EcoGuadex platform. It provides APIs for data
 
 ### 1. Clone the repository
 bash
-git clone https://github.com/ecoguadex-dev/ecoguadex-backend.git
+git clone https://github.com/nathanielacquaaharhin/ecoguadex-backend.git
 cd ecoguadex-backend
 2. Install dependencies
 npm install
