@@ -2,44 +2,23 @@
 // EcoGuadex Backend Server
 // ===============================
 
-// Load environment variables FIRST
 require("dotenv").config();
 
-// Core dependencies
 const express = require("express");
 const mongoose = require("mongoose");
 
-// Initialize app
 const app = express();
 
-// Middleware
 app.use(express.json());
 
-// ===============================
-// Debug: Check environment variable
-// ===============================
-console.log("MONGO_URI:", process.env.MONGO_URI);
+// Safe environment check
+console.log("MONGO_URI loaded:", !!process.env.MONGO_URI);
 
-// ===============================
-// MongoDB Connection
-// ===============================
 if (!process.env.MONGO_URI) {
   console.error("Startup Error: MONGO_URI is not defined in .env");
   process.exit(1);
 }
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected successfully");
-  })
-  .catch((err) => {
-    console.error("MongoDB Connection Error:", err.message);
-  });
-
-// ===============================
-// Test Route
-// ===============================
 app.get("/", (req, res) => {
   res.json({
     status: "OK",
@@ -47,11 +26,28 @@ app.get("/", (req, res) => {
   });
 });
 
-// ===============================
-// Server Start
-// ===============================
-const PORT = process.env.PORT || 5000;
+// Connect DB first, then start server
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB connected successfully");
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    const PORT = process.env.PORT || 5000;
+
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("MongoDB Connection Error:", err.message);
+    process.exit(1);
+  });
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({
+    status: "error",
+    message: "Internal Server Error",
+  });
 });
