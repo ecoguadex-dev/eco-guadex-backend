@@ -1,2 +1,2 @@
 # eco-guadex-backend
-EcoGuadex Cloud Backend API for supply chain intelligence and analytics
+This is the backend API for EcoGuadex, designed to power real-time environmental and supply chain metrics.
