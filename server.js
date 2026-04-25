@@ -1,5 +1,5 @@
 // ===============================
-// EcoGuadex Backend Server
+// EcoGuadex Backend Server (Production Safe)
 // ===============================
 
 require("dotenv").config();
@@ -11,14 +11,16 @@ const app = express();
 
 app.use(express.json());
 
-// Safe environment check
-console.log("MONGO_URI loaded:", !!process.env.MONGO_URI);
+// ===============================
+// EARLY DEBUG (VERY IMPORTANT)
+// ===============================
+console.log("🚀 SERVER STARTING...");
+console.log("MONGO_URI exists:", !!process.env.MONGO_URI);
+console.log("PORT:", process.env.PORT);
 
-if (!process.env.MONGO_URI) {
-  console.error("Startup Error: MONGO_URI is not defined in .env");
-  process.exit(1);
-}
-
+// ===============================
+// Basic Health Check Route
+// ===============================
 app.get("/", (req, res) => {
   res.json({
     status: "OK",
@@ -26,26 +28,43 @@ app.get("/", (req, res) => {
   });
 });
 
-// Connect DB first, then start server
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected successfully");
+// ===============================
+// MongoDB Connection + Server Start
+// ===============================
+const PORT = process.env.PORT || 5000;
 
-    const PORT = process.env.PORT || 5000;
+const startServer = async () => {
+  try {
+    if (!process.env.MONGO_URI) {
+      console.error("❌ MONGO_URI is missing in Render environment variables");
+      console.error("👉 Add it in Render dashboard under Environment Variables");
+      return; // DO NOT crash process
+    }
+
+    await mongoose.connect(process.env.MONGO_URI);
+
+    console.log("✅ MongoDB connected successfully");
 
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`✅ Server running on port ${PORT}`);
     });
-  })
-  .catch((err) => {
-    console.error("MongoDB Connection Error:", err.message);
-    process.exit(1);
-  });
 
-// Global error handler
+  } catch (err) {
+    console.error("❌ MongoDB Connection Error:");
+    console.error(err.message);
+
+    // Keep process alive so Render shows logs
+  }
+};
+
+startServer();
+
+// ===============================
+// Global Error Handler
+// ===============================
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error("❌ Unhandled Error:", err.stack);
+
   res.status(500).json({
     status: "error",
     message: "Internal Server Error",
