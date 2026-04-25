@@ -1,59 +1,69 @@
 # EcoGuadex Backend API
 
-This is the backend server for the EcoGuadex platform. It provides APIs for data management, user interactions, and integration with cloud services.
+This is the backend server for the EcoGuadex platform. It provides RESTful APIs for data management, user interactions, and integration with MongoDB and cloud services.
 
 
 ## 🚀 Features
 
-- RESTful API architecture
-- MongoDB database integration
-- Environment variable configuration
-- Scalable deployment (Render, AWS, etc.)
-- Error handling and logging
+- RESTful API architecture  
+- MongoDB database integration (Mongoose)  
+- Environment-based configuration  
+- Scalable deployment (Render, AWS, etc.)  
+- Error handling and logging  
 
 
 ## 🛠️ Tech Stack
 
-- Node.js
-- Express.js
-- MongoDB (Mongoose)
-- dotenv
+- Node.js  
+- Express.js  
+- MongoDB (Mongoose)  
+- dotenv  
 
+---
 
 ## 📁 Project Structure
 
+
 ├── server.js
 ├── package.json
-├── .env
+├── .env (local only)
 ├── /routes
-├── /models
 ├── /controllers
+├── /models
 └── /config
+
 
 
 ## ⚙️ Installation
 
 ### 1. Clone the repository
-bash
+```bash
 git clone https://github.com/ecoguadex-dev/eco-guadex-backend.git
-cd ecoguadex-backend
+cd eco-guadex-backend
 2. Install dependencies
 npm install
-3. Create environment variables
+🔐 Environment Variables (Local Development Only)
 
 Create a .env file in the root directory:
 
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
+
+⚠️ .env is used only for local development and is NOT used in production.
+
 ▶️ Running the Server
 Development mode
 npm run dev
 Production mode
 npm start
-🌐 Environment Variables
-Variable	Description
-PORT	Server port (default: 5000)
-MONGO_URI	MongoDB connection string
+🌐 Deployment (Render)
+
+When deploying to Render:
+
+Set environment variables in the dashboard:
+MONGO_URI → MongoDB connection string
+Do NOT set PORT
+Render assigns it automatically
 🔌 API Endpoints
 
 API documentation will be added soon.
@@ -65,5 +75,5 @@ Founder, EcoGuadex
 
 📄 License
 
-This project is proprietary software owned by EcoGuadex.
-Unauthorized copying, distribution, or modification is strictly prohibited.
+This project is proprietary software owned by EcoGuadex. Unauthorized copying, distribution, or modification is strictly prohibited.
+
