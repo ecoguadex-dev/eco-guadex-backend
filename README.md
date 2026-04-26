@@ -75,5 +75,5 @@ Founder, EcoGuadex
 
 📄 License
 
-This project is proprietary software owned by EcoGuadex. Unauthorized copying, distribution, or modification is strictly prohibited.
-
+This project is proprietary software owned by EcoGuadex.
+Unauthorized copying, distribution, or modification is strictly prohibited.
