@@ -1,24 +1,27 @@
-// ===============================
-// EcoGuadex Backend Server
-// ===============================
+import dotenv from "dotenv";
+import express from "express";
+import mongoose from "mongoose";
 
-require("dotenv").config();
+import { protect } from "./middleware/authMiddleware.js";
 
-const express = require("express");
-const mongoose = require("mongoose");
+import userRoutes from "./routes/userRoutes.js";
+import storeRoutes from "./routes/storeRoutes.js";
+import supplyFlowRoutes from "./routes/supplyFlowRoutes.js";
+
+// Load environment variables
+dotenv.config();
 
 const app = express();
 
+// Middleware
 app.use(express.json());
 
-// Safe environment check
+console.log("🚀 SERVER STARTING...");
 console.log("MONGO_URI loaded:", !!process.env.MONGO_URI);
 
-if (!process.env.MONGO_URI) {
-  console.error("Startup Error: MONGO_URI is not defined in .env");
-  process.exit(1);
-}
-
+// =======================
+// HEALTH CHECK
+// =======================
 app.get("/", (req, res) => {
   res.json({
     status: "OK",
@@ -26,11 +29,44 @@ app.get("/", (req, res) => {
   });
 });
 
-// Connect DB first, then start server
+// =======================
+// ROUTES
+// =======================
+app.use("/api/users", userRoutes);
+app.use("/api/auth", userRoutes); // optional alias for flexibility
+app.use("/api/stores", storeRoutes);
+app.use("/api/flows", supplyFlowRoutes);
+
+// =======================
+// PROTECTED ROUTE TEST
+// =======================
+app.get("/api/protected", protect, (req, res) => {
+  res.json({
+    message: "You accessed a protected route",
+    user: req.user,
+  });
+});
+
+// =======================
+// ERROR HANDLER
+// =======================
+app.use((err, req, res, next) => {
+  console.error("❌ Unhandled Error:", err.stack);
+  res.status(500).json({ message: "Internal Server Error" });
+});
+
+// =======================
+// DATABASE + SERVER START
+// =======================
+if (!process.env.MONGO_URI) {
+  console.error("❌ MONGO_URI missing");
+  process.exit(1);
+}
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("MongoDB connected successfully");
+    console.log("✅ MongoDB connected");
 
     const PORT = process.env.PORT || 5000;
 
@@ -39,16 +75,6 @@ mongoose
     });
   })
   .catch((err) => {
-    console.error("MongoDB Connection Error:", err.message);
+    console.error("MongoDB Error:", err.message);
     process.exit(1);
   });
-
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error("❌ Unhandled Error:", err.stack);
-
-  res.status(500).json({
-    status: "error",
-    message: "Internal Server Error",
-  });
-});

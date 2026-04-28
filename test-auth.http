@@ -15,3 +15,26 @@ Content-Type: application/json
   "email": "nathaniel@ecoguadex.com",
   "password": "NKMz74b@k"
 }
+
+### PROTECTED TEST
+GET http://localhost:5000/api/protected
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZWQ2Mzc3ZmYxYzA1NWY3NjhjMTM3OCIsImlhdCI6MTc3NzE2NjczMCwiZXhwIjoxNzc3MjUzMTMwfQ.Ka2dpdrwIblGN6bR_33dVV2vrzimpnP1ElDwYTTpLg0
+
+### USER PROFILE TEST
+GET http://localhost:5000/api/users/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZWQ2Mzc3ZmYxYzA1NWY3NjhjMTM3OCIsImlhdCI6MTc3NzE2NjczMCwiZXhwIjoxNzc3MjUzMTMwfQ.Ka2dpdrwIblGN6bR_33dVV2vrzimpnP1ElDwYTTpLg0 
+
+### CREATE STORE
+POST http://localhost:5000/api/stores
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZWQ2Mzc3ZmYxYzA1NWY3NjhjMTM3OCIsImlhdCI6MTc3NzE2NjczMCwiZXhwIjoxNzc3MjUzMTMwfQ.Ka2dpdrwIblGN6bR_33dVV2vrzimpnP1ElDwYTTpLg0 
+Content-Type: application/json
+
+{
+  "name": "Eco Fresh Market",
+  "location": "Accra",
+  "description": "Organic grocery store"
+}
+
+### GET STORES
+GET http://localhost:5000/api/stores
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5ZWQ2Mzc3ZmYxYzA1NWY3NjhjMTM3OCIsImlhdCI6MTc3NzE2NjczMCwiZXhwIjoxNzc3MjUzMTMwfQ.Ka2dpdrwIblGN6bR_33dVV2vrzimpnP1ElDwYTTpLg0 
