@@ -8,7 +8,9 @@ import userRoutes from "./routes/userRoutes.js";
 import storeRoutes from "./routes/storeRoutes.js";
 import supplyFlowRoutes from "./routes/supplyFlowRoutes.js";
 
-// Load environment variables
+// =======================
+// CONFIG
+// =======================
 dotenv.config();
 
 const app = express();
@@ -20,7 +22,7 @@ console.log("🚀 SERVER STARTING...");
 console.log("MONGO_URI loaded:", !!process.env.MONGO_URI);
 
 // =======================
-// HEALTH CHECK
+// HEALTH CHECK ROUTE
 // =======================
 app.get("/", (req, res) => {
   res.json({
@@ -33,12 +35,12 @@ app.get("/", (req, res) => {
 // ROUTES
 // =======================
 app.use("/api/users", userRoutes);
-app.use("/api/auth", userRoutes); // optional alias for flexibility
+app.use("/api/auth", userRoutes); // optional alias
 app.use("/api/stores", storeRoutes);
 app.use("/api/flows", supplyFlowRoutes);
 
 // =======================
-// PROTECTED ROUTE TEST
+// PROTECTED TEST ROUTE
 // =======================
 app.get("/api/protected", protect, (req, res) => {
   res.json({
@@ -70,7 +72,7 @@ mongoose
 
     const PORT = process.env.PORT || 5000;
 
-    app.listen(PORT, () => {
+    app.listen(PORT, "0.0.0.0", () => {
       console.log(`✅ Server running on port ${PORT}`);
     });
   })
